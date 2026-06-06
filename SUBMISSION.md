@@ -1,23 +1,3 @@
-## Krok 1 — API klasyfikacji i integracja OpenAI
-
-### Kluczowe elementy implementacji:
-* **Wymuszenie struktury (Structured Outputs):** Wykorzystałem natywny tryb `response_format: { type: 'json_object' }` modelu `gpt-4o-mini`, co gwarantuje 100% stabilności parsowania danych.
-* **Definiowanie granic (Few-Shot / Guardrails):** Początkowo model mylił zapytania przedzakupowe (np. pytania o rabat przy dużych ilościach) z gotowością do zakupu i wrzucał je do kategorii `zamówienie`. Dodałem do promptu systemowego ścisłe reguły i kryteria rozróżniania intencji. Dzięki temu system bezbłędnie separuje zapytania (`pytanie`) od bezpośrednich deklaracji zakupu (`zamówienie`).
-* **Walidacja i bezpieczeństwo:** Endpoint zwraca status `400 Bad Request` w przypadku wykrycia pustych ciągów znaków (po usunięciu białych spacji) lub niepoprawnego formatu body JSON. Wartość `confidence` jest matematycznie ograniczona do przedziału `[0.0, 1.0]`.
-
----
-
-## Krok 2 — Kolejka weryfikacji (Frontend)
-
-Zbudowałem dynamiczny interfejs użytkownika w `src/app/queue/page.tsx`, w pełni realizujący założenia systemu typu Human-in-the-Loop.
-
-### Zrealizowane funkcjonalności:
-* **Zarządzanie stanem (Immutable State):** Logika aplikacji opiera się na czystym stanie React (`useState`). Wszystkie operacje modyfikacji (akceptacja, odrzucenie, edycja) realizowane są bez mutowania pierwotnych struktur danych, przy użyciu metody `.map()`.
-* **Bezpieczna izolacja edycji inline:** Zaimplementowałem mechanizm edycji draftu z blokadą wycieku stanu. Tekst edytowanego draftu jest zapisywany w dedykowanym buforze, a pozostałe akcje (Zatwierdź/Odrzuć) są ukrywane na czas edycji, co zapobiega błędom operacyjnym (Race Conditions).
-* **Filtrowanie i UX:** Panel umożliwia błyskawiczne przełączanie widoków w oparciu o kategorie zgłoszeń, a przetworzone elementy otrzymują obniżoną opozycję (`opacity-50`), ułatwiając operatorowi skupienie się na zadaniach o statusie `pending`.
-
----
-
 ## Krok 3 — Funkcja autorska (Symulator wiadomości przychodzących + Licznik)
 
 Jako funkcję dodatkową wdrożyłem **Interaktywny Symulator Wiadomości Przychodzących zintegrowany z licznikiem statystyk w czasie rzeczywistym**.
